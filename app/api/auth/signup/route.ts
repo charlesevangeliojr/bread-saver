@@ -57,6 +57,8 @@ export async function POST(request: NextRequest) {
         name: newUser.name,
         picture: '', // Email users don't have profile pictures initially
         verified_email: newUser.verifiedEmail,
+        branchType: newUser.branchType,
+        bakeryName: newUser.bakeryName,
       }
     });
 

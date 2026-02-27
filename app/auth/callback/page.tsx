@@ -45,8 +45,8 @@ export default function AuthCallback() {
     handleCallback();
   }, [router]);
 
-  const handleRetrySignup = () => {
-    router.push('/?signup=true');
+  const handleRetryLogin = () => {
+    router.push('/?login=true');
   };
 
   if (loading) {
@@ -73,10 +73,10 @@ export default function AuthCallback() {
           <p className="text-gray-700 mb-6">{error}</p>
           <div className="space-y-3">
             <button 
-              onClick={handleRetrySignup}
+              onClick={handleRetryLogin}
               className="w-full px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
             >
-              Sign Up First
+              Login
             </button>
             <button 
               onClick={() => router.push('/')}

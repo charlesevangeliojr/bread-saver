@@ -77,6 +77,8 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    let user: any = null;
+
     if (action === 'login') {
       // Login flow: user must exist
       if (!existingUser) {
@@ -86,6 +88,21 @@ export async function GET(request: NextRequest) {
         redirectUrl.searchParams.set('action', 'login_failed');
         return NextResponse.redirect(redirectUrl.toString());
       }
+      
+      // Link Google account to existing user if not already linked
+      if (!existingUser.googleId) {
+        await prisma.user.update({
+          where: { id: existingUser.id },
+          data: {
+            googleId: googleId,
+            picture: userData.picture || existingUser.picture,
+            verifiedEmail: userData.verified_email || existingUser.verifiedEmail,
+          }
+        });
+      }
+      
+      // Use existing user
+      user = existingUser;
     } else {
       // Signup flow: check if user already exists
       if (existingUser) {
@@ -111,7 +128,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the user (existing or newly created)
-    const user = existingUser || await prisma.user.findFirst({
+    user = user || await prisma.user.findFirst({
       where: { googleId: googleId }
     });
 
@@ -119,8 +136,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create/retrieve user' }, { status: 500 });
     }
 
-    // Create bakery record if user has bakery name
-    if (!user.bakeryId && user.bakeryName) {
+    // Create bakery record if user has bakery name and doesn't have one yet
+    const existingBakery = await prisma.bakery.findFirst({
+      where: { userId: user.id }
+    });
+    
+    if (!existingBakery && user.bakeryName) {
       await prisma.bakery.create({
         data: {
           name: user.bakeryName,
@@ -137,6 +158,8 @@ export async function GET(request: NextRequest) {
       name: user.name,
       picture: user.picture || '',
       verified_email: user.verifiedEmail,
+      branchType: user.branchType,
+      bakeryName: user.bakeryName,
     }));
     redirectUrl.searchParams.set('token', tokenData.access_token);
     redirectUrl.searchParams.set('action', action);

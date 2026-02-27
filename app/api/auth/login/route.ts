@@ -44,6 +44,8 @@ export async function POST(request: NextRequest) {
         name: user.name,
         picture: '', // Email users don't have profile pictures initially
         verified_email: user.verifiedEmail,
+        branchType: user.branchType,
+        bakeryName: user.bakeryName,
       },
       token: 'email-login-token' // In production, use JWT
     });

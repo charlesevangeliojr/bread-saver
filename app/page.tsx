@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,6 +33,23 @@ export default function Home() {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 5000); // Auto-hide after 5 seconds
   };
+
+  // Handle URL parameters for opening modals
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginParam = urlParams.get('login');
+    const signupParam = urlParams.get('signup');
+    
+    if (loginParam === 'true') {
+      setIsLoginModalOpen(true);
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (signupParam === 'true') {
+      setIsModalOpen(true);
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   const handleEmailSignup = async () => {
     if (!selectedBranchType) {
@@ -229,6 +246,21 @@ export default function Home() {
                 />
                 <span className="text-gray-900">Sign up with Google</span>
               </button>
+            </div>
+            
+            <div className="mt-6 text-center">
+              <p className="text-gray-600 text-sm">
+                Already have an account?{' '}
+                <button 
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setIsLoginModalOpen(true);
+                  }}
+                  className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
+                >
+                  Login instead
+                </button>
+              </p>
             </div>
           </div>
         </div>

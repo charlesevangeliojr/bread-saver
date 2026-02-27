@@ -6,19 +6,20 @@ const REDIRECT_URI = 'http://localhost:3000/api/auth/callback/google';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
+  const actionParam = searchParams.get('action');
   const customState = searchParams.get('state');
   
-  // Parse custom state or create default
+  // Parse custom state or create default based on action parameter
   let stateData;
   if (customState) {
     try {
       stateData = JSON.parse(decodeURIComponent(customState));
     } catch (error) {
       console.error('Error parsing custom state:', error);
-      stateData = { action: 'signup' };
+      stateData = { action: actionParam || 'signup' };
     }
   } else {
-    stateData = { action: 'signup' };
+    stateData = { action: actionParam || 'signup' };
   }
   
   const action = stateData.action || 'signup';
